@@ -1,15 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Verify TOTP</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOTP Bestätigung</title>
 </head>
 <body>
-    <h1>Verify TOTP</h1>
-    <form method="POST">
-        <label for="current_totp">Enter TOTP:</label>
-        <input type="text" id="current_totp" name="current_totp" required>
-        <button type="submit">Verify</button>
+    <h1>TOTP Bestätigung</h1>
+    <form id="totpForm">
+        <input type="text" id="totp" placeholder="Bitte TOTP eingeben" required>
+        <button type="submit">TOTP Bestätigen</button>
     </form>
+    <p><a href="/login">Zurück zur Anmeldung</a></p>
+
+    <script>
+        document.getElementById("totpForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const totp = document.getElementById("totp").value;
+
+            const response = await fetch('/api/v1/user/verify_totp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ totp }),
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+
+            if (response.ok) {
+                window.location.href = "/dashboard"; // Weiterleitung zu Dashboard
+            }
+        };
+    </script>
 </body>
 </html>

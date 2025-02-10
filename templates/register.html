@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Einloggen</title>
+    <title>Registrieren</title>
 </head>
 <body>
-    <h1>Benutzeranmeldung</h1>
-    <form id="loginForm">
+    <h1>Benutzerregistrierung</h1>
+    <form id="registerForm">
         <input type="text" id="username" placeholder="Benutzername" required>
         <input type="password" id="password" placeholder="Passwort" required>
-        <button type="submit">Einloggen</button>
+        <button type="submit">Registrieren</button>
     </form>
-    <p>Noch nicht registriert? <a href="/register">Registrieren</a></p>
+    <p>Bereits registriert? <a href="/login">Einloggen</a></p>
 
     <script>
-        document.getElementById("loginForm").onsubmit = async (e) => {
+        document.getElementById("registerForm").onsubmit = async (e) => {
             e.preventDefault();
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
-            const response = await fetch('/api/v1/user/login', {
+            const response = await fetch('/api/v1/user/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,14 +30,6 @@
 
             const result = await response.json();
             alert(result.message || result.error);
-            if (response.ok) {
-                if (result.requires_2FA) {
-                    // Redirect to TOTP verification page
-                    window.location.href = "/verify_totp";
-                } else {
-                    window.location.href = "/dashboard"; // Weiterleitung zu Dashboard
-                }
-            }
         };
     </script>
 </body>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Willkommen im Dashboard</h1>
+    <button id="logout">Ausloggen</button>
+
+    <!--2FA things-->
+    <h1>Willkommen, {{ session.username }}!</h1>
+    
+    <h2>Two-Factor Authentifizierung</h2>
+    <div id="2fa-status">
+        <!-- The 2FA status will be displayed here -->
+    </div>
+    <button id="enable-2fa">2FA Aktivieren</button>
+    <button id="disable-2fa" style="display: none;">2FA Deaktivieren</button>
+    <div id="qr-code-container" style="display: none;">
+        <h3>QR Code</h3>
+        <div id="qr-code"></div>
+    </div>
+    
+    <script>
+        document.getElementById("logout").onclick = async () => {
+            await fetch('/api/v1/user/logout', { method: 'POST' });
+            window.location.href = '/login'; // Weiterleitung zur Anmeldeseite
+        };
+
+        document.getElementById("enable-2fa").onclick = async () => {
+            try {
+                const response = await fetch('/api/v1/user/enable2FA', { method: 'POST' });
+                const data = await response.json();
+                console.log(data.qr_code);
+                if (data.qr_code) {
+                    document.getElementById("qr-code").innerHTML = data.qr_code; // Display QR code
+                    document.getElementById("qr-code-container").style.display = "block";
+                    document.getElementById("disable-2fa").style.display = "block"; // Show the disable button
+                    document.getElementById("enable-2fa").style.display = "none"; // Hide the enable button
+                }
+                alert(data.message);
+            } catch (error) {
+                console.error(error);
+                alert('Ein Fehler ist aufgetreten. Bitte wiederholen Sie den Vorgang.');
+            }
+        };
+
+        document.getElementById("disable-2fa").onclick = async () => {
+            try {
+                const response = await fetch('/api/v1/user/disable2FA', { method: 'POST' });
+                const data = await response.json();
+                alert(data.message);
+                document.getElementById("qr-code-container").style.display = "none"; // Hide the QR code
+                document.getElementById("enable-2fa").style.display = "block"; // Show the enable button
+                document.getElementById("disable-2fa").style.display = "none"; // Hide the disable button
+            } catch (error) {
+                console.error(error);
+                alert('Ein Fehler ist aufgetreten. Bitte wiederholen Sie den Vorgang.');
+            }
+        };
+    </script>
+</body>
+</html>
